@@ -263,7 +263,7 @@ export class ChatGPTBot {
     }
     if (rawText.startsWith("/juejin ")){
       console.log(`🤖 Command: ${rawText}`)
-      const cmdContent = rawText.slice(5) // 「/cmd 」一共5个字符(注意空格)
+      const cmdContent = rawText.slice(8) // 「/cmd 」一共5个字符(注意空格)
       if (privateChat) {
         await this.command(talker, cmdContent);
       }else{
