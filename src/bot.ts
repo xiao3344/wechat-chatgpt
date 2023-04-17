@@ -178,7 +178,7 @@ export class ChatGPTBot {
         triggered = chatTriggerRule.test(text.replace(this.chatGroupTriggerRegEx, ""))
       }
     }
-    if (triggered) {
+    if (triggered&&!privateChat) {
       console.log(`🎯 Triggered ChatGPT: ${text}`);
     }
     return triggered;
@@ -225,7 +225,8 @@ export class ChatGPTBot {
     room: RoomInterface
   ) {
     const gptMessage = await this.getGPTMessage(await room.topic(),text);
-    const result = `@${talker.name()} ${text}\n\n------\n ${gptMessage}`;
+    // const result = `@${talker.name()} ${text}\n\n------\n ${gptMessage}`;
+    const result = `@${talker.name()}  ${gptMessage}`;
     await this.trySay(room, result);
   }
   async onMessage(message: Message) {
@@ -235,10 +236,13 @@ export class ChatGPTBot {
     const messageType = message.type();
     const privateChat = !room;
     if (privateChat) {
-      console.log(`🤵 Contact: ${talker.name()} 💬 Text: ${rawText}`)
+      // console.log(`🤵 Contact: ${talker.name()} 💬 Text: ${rawText}`)
     } else {
       const topic = await room.topic()
-      console.log(`🚪 Room: ${topic} 🤵 Contact: ${talker.name()} 💬 Text: ${rawText}`)
+      if(topic== '测试群1'||topic== 'ChatGPT测试群'){
+        console.log(`🚪 Room: ${topic} 🤵 Contact: ${talker.name()} 💬 Text: ${rawText}`)
+      }
+
     }
     if (this.isNonsense(talker, messageType, rawText)) {
       return;
@@ -257,7 +261,7 @@ export class ChatGPTBot {
       })
       return;
     }
-    if (rawText.startsWith("/cmd ")){
+    if (rawText.startsWith("/juejin ")){
       console.log(`🤖 Command: ${rawText}`)
       const cmdContent = rawText.slice(5) // 「/cmd 」一共5个字符(注意空格)
       if (privateChat) {
@@ -268,27 +272,46 @@ export class ChatGPTBot {
       return;
     }
     // 使用DallE生成图片
-    if (rawText.startsWith("/img")){
-      console.log(`🤖 Image: ${rawText}`)
-      const imgContent = rawText.slice(4)
-      if (privateChat) {
-        let url = await dalle(talker.name(), imgContent) as string;
-        const fileBox = FileBox.fromUrl(url)
-        message.say(fileBox)
-      }else{
-        let url = await dalle(await room.topic(), imgContent) as string;
-        const fileBox = FileBox.fromUrl(url)
-        message.say(fileBox)
-      }
-      return;
-    }
+    // if (rawText.startsWith("/img")){
+    //   console.log(`🤖 Image: ${rawText}`)
+    //   const imgContent = rawText.slice(4)
+    //   if (privateChat) {
+    //     let url = await dalle(talker.name(), imgContent) as string;
+    //     const fileBox = FileBox.fromUrl(url)
+    //     message.say(fileBox)
+    //   }else{
+    //     let url = await dalle(await room.topic(), imgContent) as string;
+    //     const fileBox = FileBox.fromUrl(url)
+    //     message.say(fileBox)
+    //   }
+    //   return;
+    // }
     if (this.triggerGPTMessage(rawText, privateChat)) {
       const text = this.cleanMessage(rawText, privateChat);
+      if (text.startsWith("/画")){
+        console.log(`🤖 Image: ${rawText}`)
+        if (privateChat) {
+          let url = await dalle(talker.name(), text) as string;
+          const fileBox = FileBox.fromUrl(url)
+          message.say(fileBox)
+        }else{
+          let url = await dalle(await room.topic(), text) as string;
+          const fileBox = FileBox.fromUrl(url)
+          message.say(fileBox)
+        }
+        return;
+      }
       if (privateChat) {
-        return await this.onPrivateMessage(talker, text);
+        // return await this.onPrivateMessage(talker, text);
       } else{
         if (!this.disableGroupMessage){
-          return await this.onGroupMessage(talker, text, room);
+          //判断那些群可以使用bot
+          const topic = await room.topic()
+          if(topic== '测试群1'||topic== 'ChatGPT测试群'){
+            console.log(`🚪 Room: ${topic} 🤵 Contact: ${talker.name()} 💬 Text: ${rawText}`)
+            return await this.onGroupMessage(talker, text, room);
+          }
+          return;
         } else {
           return;
         }
