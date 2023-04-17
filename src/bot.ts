@@ -288,7 +288,8 @@ export class ChatGPTBot {
     // }
     if (this.triggerGPTMessage(rawText, privateChat)) {
       const text = this.cleanMessage(rawText, privateChat);
-      if (text.startsWith("/画")){
+      console.log(`🤖 text: ${text}`)
+      if (text.startsWith("画")){
         console.log(`🤖 Image: ${rawText}`)
         if (privateChat) {
           let url = await dalle(talker.name(), text) as string;
