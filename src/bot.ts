@@ -291,12 +291,13 @@ export class ChatGPTBot {
       console.log(`🤖 text: ${text}`)
       if (text.startsWith("画")){
         console.log(`🤖 Image: ${rawText}`)
+        const imgContent = text.slice(1)
         if (privateChat) {
-          let url = await dalle(talker.name(), text) as string;
+          let url = await dalle(talker.name(), imgContent) as string;
           const fileBox = FileBox.fromUrl(url)
           message.say(fileBox)
         }else{
-          let url = await dalle(await room.topic(), text) as string;
+          let url = await dalle(await room.topic(), imgContent) as string;
           const fileBox = FileBox.fromUrl(url)
           message.say(fileBox)
         }
