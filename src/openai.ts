@@ -61,12 +61,12 @@ async function dalle(username:string,prompt: string) {
     response_format: CreateImageRequestResponseFormatEnum.Url,
     user: username
   }
-  // ,{
-  //   proxy:{
-  //     host:'127.0.0.1',
-  //     port:7890
-  //   }
-  // }
+  ,{
+    // proxy:{
+    //   host:'127.0.0.1',
+    //   port:7890
+    // }
+  }
   ).then((res) => res.data).catch((err) => console.log(err));
   if (response) {
     return response.data[0].url;
