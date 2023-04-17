@@ -247,20 +247,20 @@ export class ChatGPTBot {
     if (this.isNonsense(talker, messageType, rawText)) {
       return;
     }
-    if (messageType == MessageType.Audio){
-      // 保存语音文件
-      const fileBox = await message.toFileBox();
-      let fileName = "./public/" + fileBox.name;
-      await fileBox.toFile(fileName, true).catch((e) => {
-        console.log("保存语音失败",e);
-        return;
-      });
-      // Whisper
-      whisper("",fileName).then((text) => {
-        message.say(text);
-      })
-      return;
-    }
+    // if (messageType == MessageType.Audio){
+    //   // 保存语音文件
+    //   const fileBox = await message.toFileBox();
+    //   let fileName = "./public/" + fileBox.name;
+    //   await fileBox.toFile(fileName, true).catch((e) => {
+    //     console.log("保存语音失败",e);
+    //     return;
+    //   });
+    //   // Whisper
+    //   whisper("",fileName).then((text) => {
+    //     message.say(text);
+    //   })
+    //   return;
+    // }
     if (rawText.startsWith("/juejin ")){
       console.log(`🤖 Command: ${rawText}`)
       const cmdContent = rawText.slice(8) // 「/cmd 」一共5个字符(注意空格)
