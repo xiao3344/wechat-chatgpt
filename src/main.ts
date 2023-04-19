@@ -2,62 +2,25 @@ import { WechatyBuilder } from "wechaty";
 import QRCode from "qrcode";
 import { ChatGPTBot } from "./bot.js";
 import {config} from "./config.js";
-import { Brolog }       from 'brolog'
-
-import {PuppetPadlocal} from "wechaty-puppet-padlocal";
-const log = new Brolog()
-const LOGPRE = "[PadLocalDemo]"
 const chatGPTBot = new ChatGPTBot();
- enum ScanStatus {
-  Unknown   = 0,
-  Cancel    = 1,
-  Waiting   = 2,
-  Scanned   = 3,
-  Confirmed = 4,
-  Timeout   = 5,
-}
-const puppet = new PuppetPadlocal({
-  token: "puppet_padlocal_a90a63a39fa64db0b5d0dbbaa258cb31"
-})
 
 const bot =  WechatyBuilder.build({
-  name: "PadLocalDemo", // generate xxxx.memory-card.json and save login data for the next login
-  puppet
+  name: "wechat-assistant", // generate xxxx.memory-card.json and save login data for the next login
+  puppet: "wechaty-puppet-wechat",
+  puppetOptions: {
+    uos: true
+  }
 });
 async function main() {
   const initializedAt = Date.now()
   bot
-    // .on("scan", async (qrcode, status) => {
-    //   const url = `https://wechaty.js.org/qrcode/${encodeURIComponent(qrcode)}`;
-    //   console.log(`Scan QR Code to login: ${status}\n${url}`);
-    //   console.log(
-    //     await QRCode.toString(qrcode, { type: "terminal", small: true })
-    //   );
-    //   // require('qrcode-terminal').generate(qrcode, {small: true})
-    // })
-      .on("scan", async(qrcode, status) => {
-        if (status === ScanStatus.Waiting && qrcode) {
-          const qrcodeImageUrl = [
-            'https://wechaty.js.org/qrcode/',
-            encodeURIComponent(qrcode),
-          ].join('')
-
-          log.info(LOGPRE, `onScan: ${ScanStatus[status]}(${status})`);
-
-          console.log("\n==================================================================");
-          console.log("\n* Two ways to sign on with qr code");
-          console.log("\n1. Scan following QR code:\n");
-
-          // require('qrcode-terminal').generate(qrcode, {small: true})  // show qrcode on console
-            console.log(
-                    await QRCode.toString(qrcode, { type: "terminal", small: true })
-          );
-          console.log(`\n2. Or open the link in your browser: ${qrcodeImageUrl}`);
-          console.log("\n==================================================================\n");
-        } else {
-          log.info(LOGPRE, `onScan: ${ScanStatus[status]}(${status})`);
-        }
-      })
+    .on("scan", async (qrcode, status) => {
+      const url = `https://wechaty.js.org/qrcode/${encodeURIComponent(qrcode)}`;
+      console.log(`Scan QR Code to login: ${status}\n${url}`);
+      console.log(
+        await QRCode.toString(qrcode, { type: "terminal", small: true })
+      );
+    })
     .on("login", async (user) => {
       chatGPTBot.setBotName(user.name());
       console.log(`User ${user} logged in`);
